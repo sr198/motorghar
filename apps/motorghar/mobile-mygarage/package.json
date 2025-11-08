@@ -1,0 +1,17 @@
+{
+  "name": "@motorghar/motorghar-mobile-mygarage",
+  "version": "0.0.1",
+  "private": true,
+  "nx": {
+    "name": "motorghar-mobile-mygarage"
+  },
+  "dependencies": {
+    "@react-native/metro-config": "*",
+    "react": "*",
+    "react-native": "*",
+    "react-native-svg": "*",
+    "@testing-library/react-native": "*",
+    "react-test-renderer": "*",
+    "metro-config": "*"
+  }
+}

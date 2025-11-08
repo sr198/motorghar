@@ -1,0 +1,198 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// OUTBOX PATTERN - Event-driven architecture support
+// ============================================================================
+
+model DomainOutbox {
+  id            String    @id @default(uuid()) @db.Uuid
+  aggregateType String    @map("aggregate_type") @db.VarChar(100)
+  aggregateId   String    @map("aggregate_id") @db.VarChar(100)
+  eventType     String    @map("event_type") @db.VarChar(100)
+  payloadJsonb  Json      @map("payload_jsonb") @db.JsonB
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  processedAt   DateTime? @map("processed_at") @db.Timestamp(6)
+
+  @@index([processedAt], map: "idx_outbox_processed")
+  @@map("domain_outbox")
+}
+
+// ============================================================================
+// CATALOG SERVICE - Vehicle catalog
+// ============================================================================
+
+model VehicleCatalog {
+  id         String    @id @default(uuid()) @db.Uuid
+  make       String    @db.VarChar(100)
+  model      String    @db.VarChar(100)
+  year       Int
+  trim       String    @db.VarChar(100)
+  fuelType   String?   @map("fuel_type") @db.VarChar(50)
+  specsJsonb Json      @default("{}") @map("specs_jsonb") @db.JsonB
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
+  deletedAt  DateTime? @map("deleted_at") @db.Timestamp(6)
+
+  media         VehicleCatalogMedia[]
+  ownerVehicles OwnerVehicle[] // Prisma requires back-reference (ORM only, not used in domain logic)
+
+  @@index([make, model, year])
+  @@index([deletedAt])
+  @@map("vehicle_catalog")
+}
+
+model VehicleCatalogMedia {
+  id        String   @id @default(uuid()) @db.Uuid
+  catalogId String   @map("catalog_id") @db.Uuid
+  url       String   @db.VarChar(500)
+  kind      String   @db.VarChar(50) // 'image' | 'video'
+  order     Int      @default(0) // Display order
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+
+  catalog VehicleCatalog @relation(fields: [catalogId], references: [id], onDelete: Cascade)
+
+  @@index([catalogId])
+  @@index([catalogId, order])
+  @@map("vehicle_catalog_media")
+}
+
+// ============================================================================
+// GARAGE SERVICE - User-owned vehicles and related data
+// ============================================================================
+
+model OwnerVehicle {
+  id          String    @id @default(uuid()) @db.Uuid
+  userId      String    @map("user_id") @db.VarChar(100)
+  catalogId   String    @map("catalog_id") @db.Uuid
+  nickname    String?   @db.VarChar(200)
+  odoKm       Int?      @map("odo_km")
+  fieldsJsonb Json      @default("{}") @map("fields_jsonb") @db.JsonB
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt   DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamp(6)
+
+  catalog      VehicleCatalog        @relation(fields: [catalogId], references: [id])
+  notes        OwnerVehicleNote[]
+  media        OwnerVehicleMedia[]
+  reviews      OwnerVehicleReview[]
+  appointments ServiceAppointment[]
+
+  @@index([userId])
+  @@index([catalogId])
+  @@index([deletedAt])
+  @@map("owner_vehicle")
+}
+
+model OwnerVehicleNote {
+  id             String   @id @default(uuid()) @db.Uuid
+  ownerVehicleId String   @map("owner_vehicle_id") @db.Uuid
+  body           String   @db.Text
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  ownerVehicle OwnerVehicle @relation(fields: [ownerVehicleId], references: [id], onDelete: Cascade)
+
+  @@index([ownerVehicleId])
+  @@map("owner_vehicle_note")
+}
+
+model OwnerVehicleMedia {
+  id             String   @id @default(uuid()) @db.Uuid
+  ownerVehicleId String   @map("owner_vehicle_id") @db.Uuid
+  url            String   @db.VarChar(500)
+  kind           String   @db.VarChar(50) // 'image' | 'video'
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+
+  ownerVehicle OwnerVehicle @relation(fields: [ownerVehicleId], references: [id], onDelete: Cascade)
+
+  @@index([ownerVehicleId])
+  @@map("owner_vehicle_media")
+}
+
+model OwnerVehicleReview {
+  id             String   @id @default(uuid()) @db.Uuid
+  ownerVehicleId String   @map("owner_vehicle_id") @db.Uuid
+  rating         Int      @db.SmallInt // 1-5
+  comment        String?  @db.Text
+  approved       Boolean  @default(false)
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  ownerVehicle OwnerVehicle @relation(fields: [ownerVehicleId], references: [id], onDelete: Cascade)
+
+  @@index([ownerVehicleId])
+  @@index([approved])
+  @@map("owner_vehicle_review")
+}
+
+// ============================================================================
+// SERVICE CENTER SERVICE - Centers and appointments
+// ============================================================================
+
+model ServiceCenter {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String   @db.VarChar(200)
+  address   String   @db.VarChar(500)
+  phone     String?  @db.VarChar(50)
+  email     String?  @db.VarChar(200)
+  latitude  Float
+  longitude Float
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  appointments ServiceAppointment[]
+
+  @@index([latitude, longitude])
+  @@map("service_center")
+}
+
+model ServiceAppointment {
+  id             String   @id @default(uuid()) @db.Uuid
+  ownerVehicleId String   @map("owner_vehicle_id") @db.Uuid
+  centerId       String   @map("center_id") @db.Uuid
+  slotTs         DateTime @map("slot_ts") @db.Timestamp(6)
+  status         String   @db.VarChar(50) // 'pending', 'confirmed', 'cancelled', 'completed'
+  notes          String?  @db.Text
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  ownerVehicle OwnerVehicle  @relation(fields: [ownerVehicleId], references: [id])
+  center       ServiceCenter @relation(fields: [centerId], references: [id])
+
+  @@index([ownerVehicleId])
+  @@index([centerId])
+  @@index([slotTs])
+  @@index([status])
+  @@map("service_appointment")
+}
+
+// ============================================================================
+// CONTENT SERVICE - News, events, videos, recalls
+// ============================================================================
+
+model ContentPost {
+  id         String    @id @default(uuid()) @db.Uuid
+  type       String    @db.VarChar(50) // 'news', 'event', 'video', 'recall'
+  title      String    @db.VarChar(300)
+  bodyMd     String    @map("body_md") @db.Text
+  vehicleIds String[]  @map("vehicle_ids") @default([])
+  status     String    @db.VarChar(50) // 'draft', 'published'
+  publishAt  DateTime? @map("publish_at") @db.Timestamp(6)
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  @@index([type])
+  @@index([status])
+  @@index([publishAt])
+  @@map("content_post")
+}

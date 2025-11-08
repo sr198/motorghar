@@ -1,0 +1,50 @@
+{
+  "name": "motorghar",
+  "$schema": "node_modules/nx/schemas/project-schema.json",
+  "projectType": "library",
+  "sourceRoot": ".",
+  "targets": {
+    "prisma:generate": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "prisma generate",
+        "cwd": "."
+      }
+    },
+    "prisma:migrate": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "prisma migrate dev",
+        "cwd": "."
+      }
+    },
+    "prisma:migrate:deploy": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "prisma migrate deploy",
+        "cwd": "."
+      }
+    },
+    "prisma:seed": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "prisma db seed",
+        "cwd": "."
+      }
+    },
+    "prisma:studio": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "prisma studio",
+        "cwd": "."
+      }
+    },
+    "prisma:reset": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "prisma migrate reset --force",
+        "cwd": "."
+      }
+    }
+  }
+}

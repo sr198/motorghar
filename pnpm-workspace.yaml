@@ -1,4 +1,7 @@
 packages:
-  - "packages/*"
-
+  - 'packages/*'
+  - 'apps/*'
+  - 'apps/motorghar/*'
+  - 'libs/shared/*'
+  - 'libs/motorghar/*'
 autoInstallPeers: true

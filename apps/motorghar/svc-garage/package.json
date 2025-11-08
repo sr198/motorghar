@@ -1,0 +1,113 @@
+{
+  "name": "@motorghar/motorghar-svc-garage",
+  "version": "0.0.1",
+  "private": true,
+  "nx": {
+    "name": "motorghar-svc-garage",
+    "targets": {
+      "build": {
+        "executor": "@nx/esbuild:esbuild",
+        "outputs": [
+          "{options.outputPath}"
+        ],
+        "defaultConfiguration": "production",
+        "options": {
+          "platform": "node",
+          "outputPath": "apps/motorghar/svc-garage/dist",
+          "format": [
+            "cjs"
+          ],
+          "bundle": false,
+          "main": "apps/motorghar/svc-garage/src/main.ts",
+          "tsConfig": "apps/motorghar/svc-garage/tsconfig.app.json",
+          "assets": [
+            "apps/motorghar/svc-garage/src/assets"
+          ],
+          "esbuildOptions": {
+            "sourcemap": true,
+            "outExtension": {
+              ".js": ".js"
+            }
+          }
+        },
+        "configurations": {
+          "development": {},
+          "production": {
+            "esbuildOptions": {
+              "sourcemap": false,
+              "outExtension": {
+                ".js": ".js"
+              }
+            }
+          }
+        }
+      },
+      "prune-lockfile": {
+        "dependsOn": [
+          "build"
+        ],
+        "cache": true,
+        "executor": "@nx/js:prune-lockfile",
+        "outputs": [
+          "{workspaceRoot}/apps/motorghar/svc-garage/dist/package.json",
+          "{workspaceRoot}/apps/motorghar/svc-garage/dist/pnpm-lock.yaml"
+        ],
+        "options": {
+          "buildTarget": "build"
+        }
+      },
+      "copy-workspace-modules": {
+        "dependsOn": [
+          "build"
+        ],
+        "cache": true,
+        "outputs": [
+          "{workspaceRoot}/apps/motorghar/svc-garage/dist/workspace_modules"
+        ],
+        "executor": "@nx/js:copy-workspace-modules",
+        "options": {
+          "buildTarget": "build"
+        }
+      },
+      "prune": {
+        "dependsOn": [
+          "prune-lockfile",
+          "copy-workspace-modules"
+        ],
+        "executor": "nx:noop"
+      },
+      "serve": {
+        "continuous": true,
+        "executor": "@nx/js:node",
+        "defaultConfiguration": "development",
+        "dependsOn": [
+          "build"
+        ],
+        "options": {
+          "buildTarget": "motorghar-svc-garage:build",
+          "runBuildTargetDependencies": false
+        },
+        "configurations": {
+          "development": {
+            "buildTarget": "motorghar-svc-garage:build:development"
+          },
+          "production": {
+            "buildTarget": "motorghar-svc-garage:build:production"
+          }
+        }
+      },
+      "test": {
+        "options": {
+          "passWithNoTests": true
+        }
+      }
+    }
+  },
+  "dependencies": {
+    "fastify": "~5.2.1",
+    "fastify-plugin": "~5.0.1",
+    "@fastify/autoload": "~6.0.3",
+    "@fastify/sensible": "~6.0.2",
+    "dotenv": "^16.4.5"
+  }
+}

@@ -2,5 +2,66 @@
   "extends": "./tsconfig.base.json",
   "compileOnSave": false,
   "files": [],
-  "references": []
+  "references": [
+    {
+      "path": "./apps/motorghar/fastify-gateway"
+    },
+    {
+      "path": "./apps/motorghar/svc-catalog"
+    },
+    {
+      "path": "./apps/motorghar/svc-content"
+    },
+    {
+      "path": "./apps/motorghar/svc-service-center"
+    },
+    {
+      "path": "./apps/motorghar/svc-garage"
+    },
+    {
+      "path": "./apps/motorghar/web-admin-console-e2e"
+    },
+    {
+      "path": "./apps/motorghar/web-admin-console"
+    },
+    {
+      "path": "./apps/motorghar/web-mygarage-e2e"
+    },
+    {
+      "path": "./apps/motorghar/web-mygarage"
+    },
+    {
+      "path": "./libs/shared/types"
+    },
+    {
+      "path": "./libs/shared/config"
+    },
+    {
+      "path": "./libs/shared/testing"
+    },
+    {
+      "path": "./libs/shared/ui"
+    },
+    {
+      "path": "./libs/motorghar/contracts"
+    },
+    {
+      "path": "./libs/motorghar/domain"
+    },
+    {
+      "path": "./libs/motorghar/adapters"
+    },
+    {
+      "path": "./libs/motorghar/services"
+    },
+    {
+      "path": "./libs/motorghar/constants"
+    },
+    {
+      "path": "./apps/motorghar/mobile-mygarage-e2e"
+    },
+    {
+      "path": "./apps/motorghar/mobile-mygarage"
+    }
+  ]
 }
