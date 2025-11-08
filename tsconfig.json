@@ -19,18 +19,6 @@
       "path": "./apps/motorghar/svc-garage"
     },
     {
-      "path": "./apps/motorghar/web-admin-console-e2e"
-    },
-    {
-      "path": "./apps/motorghar/web-admin-console"
-    },
-    {
-      "path": "./apps/motorghar/web-mygarage-e2e"
-    },
-    {
-      "path": "./apps/motorghar/web-mygarage"
-    },
-    {
       "path": "./libs/shared/types"
     },
     {
@@ -62,6 +50,18 @@
     },
     {
       "path": "./apps/motorghar/mobile-mygarage"
+    },
+    {
+      "path": "./apps/motorghar/web-admin-console-e2e"
+    },
+    {
+      "path": "./apps/motorghar/web-admin-console"
+    },
+    {
+      "path": "./apps/motorghar/web-mygarage-e2e"
+    },
+    {
+      "path": "./apps/motorghar/web-mygarage"
     }
   ]
 }

@@ -108,6 +108,7 @@
     "fastify-plugin": "~5.0.1",
     "@fastify/autoload": "~6.0.3",
     "@fastify/sensible": "~6.0.2",
-    "dotenv": "^16.4.5"
+    "dotenv": "^16.4.5",
+    "@motorghar/adapters": "workspace:*"
   }
 }

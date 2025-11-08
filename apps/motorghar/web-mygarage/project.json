@@ -1,0 +1,27 @@
+{
+  "name": "motorghar-web-mygarage",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/motorghar/web-mygarage/src",
+  "projectType": "application",
+  "targets": {
+    "serve": {
+      "executor": "@nx/next:server",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "motorghar-web-mygarage:build",
+        "dev": true,
+        "port": 4001
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "motorghar-web-mygarage:build:development",
+          "dev": true
+        },
+        "production": {
+          "buildTarget": "motorghar-web-mygarage:build:production",
+          "dev": false
+        }
+      }
+    }
+  }
+}

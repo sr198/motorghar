@@ -1,109 +1,214 @@
-# Motorghar
+# MotorGhar
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+**MotorGhar** is a comprehensive motorcycle and vehicle management platform built with modern web and mobile technologies.
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is ready ✨.
+## Architecture
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/nx-api/js?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+- **Monorepo**: Nx-powered monorepo with TypeScript
+- **Backend**: Fastify microservices architecture
+- **Frontend**: Next.js (web) + React Native (mobile)
+- **Database**: PostgreSQL with Prisma ORM
+- **Cache**: Redis
+- **Storage**: MinIO (S3-compatible)
 
-## Generate a library
+## Quick Start
 
-```sh
-npx nx g @nx/js:lib packages/pkg1 --publishable --importPath=@my-org/pkg1
+### Prerequisites
+
+- Node.js 20+
+- pnpm 8+
+- Docker & Docker Compose
+
+### 1. Install Dependencies
+
+```bash
+pnpm install
 ```
 
-## Run tasks
+### 2. Start Infrastructure (Docker)
 
-To build the library use:
-
-```sh
-npx nx build pkg1
+```bash
+cd infra
+docker-compose up -d
 ```
 
-To run any task with Nx use:
+This starts:
+- PostgreSQL (port 5432)
+- Redis (port 6379)
+- MinIO (API: 9000, Console: 9001)
+- pgAdmin (port 5050)
 
-```sh
-npx nx <target> <project-name>
+### 3. Setup Environment
+
+```bash
+# Copy environment template
+cp .env.example .env
+
+# Update .env with your values (defaults should work for local dev)
 ```
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+### 4. Setup Database
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+```bash
+# Generate Prisma Client
+nx run prisma:generate
 
-## Versioning and releasing
+# Run migrations
+nx run prisma:migrate
 
-To version and release the library use
-
-```
-npx nx release
-```
-
-Pass `--dry-run` to see what would happen without actually releasing the library.
-
-[Learn more about Nx release &raquo;](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Keep TypeScript project references up to date
-
-Nx automatically updates TypeScript [project references](https://www.typescriptlang.org/docs/handbook/project-references.html) in `tsconfig.json` files to ensure they remain accurate based on your project dependencies (`import` or `require` statements). This sync is automatically done when running tasks such as `build` or `typecheck`, which require updated references to function correctly.
-
-To manually trigger the process to sync the project graph dependencies information to the TypeScript project references, run the following command:
-
-```sh
-npx nx sync
+# Seed database
+nx run prisma:seed
 ```
 
-You can enforce that the TypeScript project references are always in the correct state when running in CI by adding a step to your CI job configuration that runs the following command:
+### 5. Build & Run
 
-```sh
-npx nx sync:check
+```bash
+# Build all packages
+nx run-many --target=build --all
+
+# Run backend services
+nx serve fastify-gateway          # Port 3000
+nx serve svc-catalog               # Port 3001
+nx serve svc-content               # Port 3002
+nx serve svc-service-center        # Port 3003
+nx serve svc-garage                # Port 3004
+
+# Run frontend apps
+nx serve motorghar-web-admin-console    # Port 4000
+nx serve motorghar-web-mygarage         # Port 4001
+
+# Run mobile app (Metro bundler)
+nx start motorghar-mobile-mygarage      # Port 8081
 ```
 
-[Learn more about nx sync](https://nx.dev/reference/nx-commands#sync)
+## Services & Ports
 
-## Set up CI!
+### Infrastructure (Docker)
+| Service    | Port | Description        |
+|------------|------|--------------------|
+| PostgreSQL | 5432 | Database           |
+| Redis      | 6379 | Cache/Sessions     |
+| MinIO API  | 9000 | Object Storage     |
+| MinIO UI   | 9001 | Storage Console    |
+| pgAdmin    | 5050 | DB Management      |
 
-### Step 1
+### Applications (Local)
+| Service                | Port | Description                |
+|------------------------|------|----------------------------|
+| fastify-gateway        | 3000 | API Gateway                |
+| svc-catalog            | 3001 | Vehicle Catalog Service    |
+| svc-content            | 3002 | Content Management Service |
+| svc-service-center     | 3003 | Service Center Service     |
+| svc-garage             | 3004 | User Garage Service        |
+| web-admin-console      | 4000 | Admin Web App (Next.js)    |
+| web-mygarage           | 4001 | User Web App (Next.js)     |
+| mobile-mygarage (metro)| 8081 | Mobile App Metro Bundler   |
 
-To connect to Nx Cloud, run the following command:
+## Health Checks
 
-```sh
-npx nx connect
+```bash
+# Gateway (includes Redis check)
+curl http://localhost:3000/health
+
+# Backend services (include DB check)
+curl http://localhost:3001/health  # Catalog
+curl http://localhost:3002/health  # Content
+curl http://localhost:3003/health  # Service Center
+curl http://localhost:3004/health  # Garage
 ```
 
-Connecting to Nx Cloud ensures a [fast and scalable CI](https://nx.dev/ci/intro/why-nx-cloud?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) pipeline. It includes features such as:
+## Common Commands
 
-- [Remote caching](https://nx.dev/ci/features/remote-cache?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task distribution across multiple machines](https://nx.dev/ci/features/distribute-task-execution?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Automated e2e test splitting](https://nx.dev/ci/features/split-e2e-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task flakiness detection and rerunning](https://nx.dev/ci/features/flaky-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+### Prisma
 
-### Step 2
+```bash
+# Generate Prisma Client
+nx run prisma:generate
 
-Use the following command to configure a CI workflow for your workspace:
+# Create migration
+nx run prisma:migrate
 
-```sh
-npx nx g ci-workflow
+# Apply migrations (production)
+nx run prisma:migrate:deploy
+
+# Seed database
+nx run prisma:seed
+
+# Open Prisma Studio
+nx run prisma:studio
 ```
 
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+### Build & Test
 
-## Install Nx Console
+```bash
+# Build all
+nx run-many --target=build --all
 
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
+# Build specific app
+nx build fastify-gateway
 
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+# Lint all
+nx run-many --target=lint --all
 
-## Useful links
+# Test all
+nx run-many --target=test --all
+```
 
-Learn more:
+### Docker
 
-- [Learn more about this workspace setup](https://nx.dev/nx-api/js?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+```bash
+# Start infrastructure
+cd infra && docker-compose up -d
 
-And join the Nx community:
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+# Stop infrastructure
+cd infra && docker-compose down
+
+# View logs
+cd infra && docker-compose logs -f
+
+# Reset everything (WARNING: deletes data)
+cd infra && docker-compose down -v
+```
+
+## Project Structure
+
+```
+motorghar/
+├── apps/
+│   └── motorghar/
+│       ├── fastify-gateway/          # API Gateway
+│       ├── svc-catalog/              # Catalog Microservice
+│       ├── svc-content/              # Content Microservice
+│       ├── svc-service-center/       # Service Center Microservice
+│       ├── svc-garage/               # Garage Microservice
+│       ├── web-admin-console/        # Admin Web App (Next.js)
+│       ├── web-mygarage/             # User Web App (Next.js)
+│       └── mobile-mygarage/          # Mobile App (React Native)
+├── libs/
+│   ├── shared/
+│   │   ├── contracts/                # API contracts (Zod)
+│   │   ├── types/                    # Shared TypeScript types
+│   │   ├── config/                   # Shared configs
+│   │   ├── testing/                  # Test utilities
+│   │   └── ui/                       # Shared UI components
+│   └── motorghar/
+│       ├── domain/                   # Domain entities & logic
+│       ├── adapters/                 # Prisma, Redis, MinIO adapters
+│       ├── services/                 # Service clients
+│       └── constants/                # App constants
+├── infra/
+│   ├── docker-compose.yml            # Infrastructure services
+│   └── .env                          # Infrastructure config
+├── prisma/
+│   ├── schema.prisma                 # Database schema
+│   └── seed.ts                       # Database seed script
+└── specs/                            # Project specifications
+```
+
+## Development
+
+See [DEVELOPMENT.md](./DEVELOPMENT.md) for detailed development guidelines, architecture decisions, and best practices.
+
+## License
+
+MIT

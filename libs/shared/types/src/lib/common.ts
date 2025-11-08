@@ -62,10 +62,10 @@ export type DeepPartial<T> = {
 
 // Pick properties that are required
 export type RequiredKeys<T> = {
-  [K in keyof T]-?: {} extends Pick<T, K> ? never : K;
+  [K in keyof T]-?: Record<string, never> extends Pick<T, K> ? never : K;
 }[keyof T];
 
 // Pick properties that are optional
 export type OptionalKeys<T> = {
-  [K in keyof T]-?: {} extends Pick<T, K> ? K : never;
+  [K in keyof T]-?: Record<string, never> extends Pick<T, K> ? K : never;
 }[keyof T];

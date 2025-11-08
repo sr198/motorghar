@@ -1,0 +1,14 @@
+{
+  "name": "motorghar-mobile-mygarage",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/motorghar/mobile-mygarage/src",
+  "projectType": "application",
+  "targets": {
+    "start": {
+      "executor": "@nx/react-native:start",
+      "options": {
+        "port": 8081
+      }
+    }
+  }
+}

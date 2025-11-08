@@ -1,0 +1,27 @@
+{
+  "name": "motorghar-web-admin-console",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/motorghar/web-admin-console/src",
+  "projectType": "application",
+  "targets": {
+    "serve": {
+      "executor": "@nx/next:server",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "motorghar-web-admin-console:build",
+        "dev": true,
+        "port": 4000
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "motorghar-web-admin-console:build:development",
+          "dev": true
+        },
+        "production": {
+          "buildTarget": "motorghar-web-admin-console:build:production",
+          "dev": false
+        }
+      }
+    }
+  }
+}
