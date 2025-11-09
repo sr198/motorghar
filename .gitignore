@@ -134,4 +134,5 @@ infra/.env.local
 
 
 #Extras
-specs.vscode/
+specs
+.vscode/
