@@ -19,6 +19,12 @@
   ],
   "references": [
     {
+      "path": "../../../libs/shared/types/tsconfig.lib.json"
+    },
+    {
+      "path": "../../../libs/motorghar/contracts/tsconfig.lib.json"
+    },
+    {
       "path": "../../../libs/motorghar/adapters/tsconfig.lib.json"
     }
   ]

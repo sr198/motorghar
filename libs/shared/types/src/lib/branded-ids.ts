@@ -22,6 +22,42 @@ export type AppointmentId = Brand<string, 'AppointmentId'>;
 export type ContentPostId = Brand<string, 'ContentPostId'>;
 export type UserId = Brand<string, 'UserId'>;
 
+// R1 Spec - Additional branded IDs
+export type CatalogId = Brand<string, 'CatalogId'>;
+export type VariantId = Brand<string, 'VariantId'>;
+export type CenterId = Brand<string, 'CenterId'>;
+export type ContentId = Brand<string, 'ContentId'>;
+export type ReviewId = Brand<string, 'ReviewId'>;
+
+// R1 Spec - Helper functions for creating branded IDs
+export function catalogId(id: string): CatalogId {
+  return id as CatalogId;
+}
+
+export function variantId(id: string): VariantId {
+  return id as VariantId;
+}
+
+export function centerId(id: string): CenterId {
+  return id as CenterId;
+}
+
+export function contentId(id: string): ContentId {
+  return id as ContentId;
+}
+
+export function reviewId(id: string): ReviewId {
+  return id as ReviewId;
+}
+
+export function userId(id: string): UserId {
+  return id as UserId;
+}
+
+export function ownerVehicleId(id: string): OwnerVehicleId {
+  return id as OwnerVehicleId;
+}
+
 // Helper to create branded IDs (with runtime validation)
 export function createBrandedId<T extends string>(
   value: string,
