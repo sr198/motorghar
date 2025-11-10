@@ -1,26 +1,22 @@
 import 'dotenv/config';
-import Fastify from 'fastify';
-import { app } from './app/app';
+import { buildApp } from './app.js';
+import { config } from './config/index.js';
 
-const host = process.env.HOST ?? 'localhost';
-const port = process.env.PORT_GATEWAY
-  ? Number(process.env.PORT_GATEWAY)
-  : 3000;
+async function start() {
+  try {
+    const app = await buildApp();
 
-// Instantiate Fastify with some config
-const server = Fastify({
-  logger: true,
-});
+    await app.listen({
+      port: config.port,
+      host: '0.0.0.0',
+    });
 
-// Register your application as a normal plugin.
-server.register(app);
-
-// Start listening.
-server.listen({ port, host }, (err) => {
-  if (err) {
-    server.log.error(err);
+    console.log(`🚀 Gateway running on http://localhost:${config.port}`);
+    console.log(`📋 Environment: ${config.env}`);
+  } catch (error) {
+    console.error('❌ Failed to start gateway:', error);
     process.exit(1);
-  } else {
-    console.log(`[ ready ] http://${host}:${port}`);
   }
-});
+}
+
+start();

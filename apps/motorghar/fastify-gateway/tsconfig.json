@@ -4,6 +4,12 @@
   "include": [],
   "references": [
     {
+      "path": "../../../libs/shared/types"
+    },
+    {
+      "path": "../../../libs/motorghar/contracts"
+    },
+    {
       "path": "../../../libs/motorghar/adapters"
     },
     {

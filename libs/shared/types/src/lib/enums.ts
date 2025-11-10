@@ -2,7 +2,7 @@
  * Common enums used across the application
  */
 
-// Content types
+// Content types (R1 Spec)
 export enum ContentType {
   News = 'news',
   Event = 'event',
@@ -10,10 +10,32 @@ export enum ContentType {
   Recall = 'recall',
 }
 
-// Content status
+export enum ContentPostType {
+  NEWS = 'news',
+  EVENT = 'event',
+  VIDEO = 'video',
+  RECALL = 'recall',
+}
+
+// Content status (R1 Spec)
 export enum ContentStatus {
   Draft = 'draft',
   Published = 'published',
+}
+
+export enum ContentPostStatus {
+  DRAFT = 'draft',
+  PUBLISHED = 'published',
+  ARCHIVED = 'archived',
+}
+
+// Entity types (R1 Spec)
+export enum EntityType {
+  VEHICLE_CATALOG = 'vehicle.catalog#v1',
+  VEHICLE_VARIANT = 'vehicle.variant#v1',
+  SERVICE_CENTER = 'service.center#v1',
+  CONTENT_POST = 'content.post#v1',
+  OWNER_VEHICLE_REVIEW = 'owner.vehicle.review#v1',
 }
 
 // Media kinds
